@@ -68,8 +68,10 @@ App.Views.Tasks = Backbone.View.extend({
 
 
 App.Views.AddTask = Backbone.View.extend({
-	initialize: function(){
-		
+	  el: '#addTask',
+	
+	initialize: function(){	
+	   console.log(this.el.innerHTML);
 	}
 });
 
@@ -91,5 +93,7 @@ var tasksView = new App.Views.Tasks({collection:  tasksCollection});
 
 
 $('.tasks').html(tasksView.render().el);
+
+var addTaskView = new App.Views.AddTask();
 
 });
