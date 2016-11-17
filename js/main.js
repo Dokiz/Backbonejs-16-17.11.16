@@ -5,7 +5,6 @@ $(function() {
 		Collections:{},
 		Views: {}
 	};
-
 	window.template = function(id) {
 	   return _.template( $('#' + id).html() );
 	};
@@ -20,6 +19,7 @@ App.Models.Task = Backbone.Model.extend({
 
 App.Views.Task = Backbone.View.extend({
 	initialize: function(){
+			
 	this.model.on ('change', this.render, this);
 	this.model.on ('destroy', this.remove, this);
 	},
@@ -43,7 +43,6 @@ App.Views.Task = Backbone.View.extend({
 	},
 	editTask: function () {
 	var newTaskTitle =  prompt('Как переименуем задачу?', this.model.get('title'));
-
 	 this.model.set('title', newTaskTitle);
 
 	}
@@ -54,10 +53,15 @@ App.Collections.Task = Backbone.Collection.extend({
 
 App.Views.Tasks = Backbone.View.extend({
 	 tagName: 'ul',
+	 
+	 initialize:function(){
+		 this.collection.on('add', this.addOne, this);
+	 },
 	 render: function () {
 		  this.collection.each(this.addOne,this);
 		  return this;
 	 },
+	 
 	 addOne: function (task) {
 		 // создавать новый дочерний вид 
 		 var taskView = new App.Views.Task({ model: task});
@@ -65,13 +69,21 @@ App.Views.Tasks = Backbone.View.extend({
 		 this.$el.append(taskView.render().el);
 	 }
 });
-
-
 App.Views.AddTask = Backbone.View.extend({
-	  el: '#addTask',
+	el: '#addTask',
 	
-	initialize: function(){	
-	   console.log(this.el.innerHTML);
+	events: {
+	'submit' : 'submit'
+	},
+	
+	initialize: function(){
+		
+	},
+	submit:function(e){
+	e.preventDefault();	
+	var newTaskTitle = $(e.currentTarget).find('input[type=text]').val();
+	var newTask = new App.Models.Task({title: newTaskTitle});
+	this.collection.add(newTask);
 	}
 });
 
@@ -94,6 +106,6 @@ var tasksView = new App.Views.Tasks({collection:  tasksCollection});
 
 $('.tasks').html(tasksView.render().el);
 
-var addTaskView = new App.Views.AddTask();
+var addTaskViews = new App.Views.AddTask({collection: tasksCollection});
 
 });
